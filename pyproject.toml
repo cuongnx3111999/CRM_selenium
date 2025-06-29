@@ -1,0 +1,204 @@
+# pyproject.toml (Fixed - No Warnings)
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 150
+target-version = ['py310']
+
+[project]
+name = "my-selenium-pytest-framework"
+version = "0.1.0"
+description = "Framework kiểm thử tự động với Selenium và Pytest"
+requires-python = ">=3.10"
+dependencies = [
+    # Testing Framework
+    "pytest>=8.3.5",
+    "pytest-html>=4.1.1",
+    "pytest-xdist>=3.7.0",
+    "pytest-rerunfailures>=12.0",
+    "pytest-cov>=4.0.0",
+
+    # Selenium & WebDriver
+    "selenium >=4.33.0",
+    "webdriver-manager>=4.0.2",
+
+    # Data Handling
+    "pandas>=2.0.0",
+    "openpyxl>=3.1.0",
+    "faker>=18.13.0",
+
+    # Configuration & Environment
+    "python-dotenv>=1.1.0",
+    "pydantic>=2.0.0",
+
+    # Utilities
+    "pluggy>=1.0.0",
+    "requests>=2.31.0",
+    "pillow>=10.0.0",
+    "colorlog>=6.7.0",
+
+    "beautifulsoup4>=4.12.2",
+    "lxml>=4.9.3",
+
+    "pygetwindow",
+    "pyautogui",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Code Quality
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.8.0",
+    "isort>=5.12.0",
+    "pre-commit>=3.0.0",
+
+    # Testing & Coverage
+    "coverage>=7.0.0",
+    "pytest-mock>=3.11.0",
+    "pytest-timeout>=2.1.0",
+
+    # Development Tools
+    "ipython>=8.0.0",
+    "jupyter>=1.0.0",
+    "rich>=13.0.0",
+]
+
+# --- Cấu hình Setuptools ---
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "pages*",
+    "utils*",
+    "config*"
+]
+exclude = [
+    "data*",
+    "reports*",
+    "venv*",
+    ".venv*",
+    "dist*",
+    "build*"
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.env"]
+
+# --- Cấu hình Pytest (FIXED) ---
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-v -s --html=reports/report.html --self-contained-html --import-mode=append --disable-warnings"
+
+filterwarnings = [
+    "ignore::_pytest.warning_types.PytestConfigWarning",
+    "ignore::_pytest.warning_types.PytestUnknownMarkWarning",
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning"
+]
+
+markers = [
+    "smoke: Các test cơ bản, quan trọng.",
+    "regression: Bộ test đầy đủ.",
+    "login: Các test liên quan đến đăng nhập.",
+    "dashboard: Các test liên quan đến dashboard.",
+    "dependency: Mark test dependencies",
+    "role: Role related tests",
+    "template: Template related tests",
+    "users: User related tests",
+    "performance: Performance tests"
+]
+
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+# --- Cấu hình Coverage ---
+[tool.coverage.run]
+source = ["pages", "utils", "config"]
+omit = [
+    "*/test_*.py",
+    "*/conftest.py",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+# --- Cấu hình MyPy ---
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+pretty = true
+
+# Exclude các thư mục không cần check
+exclude = [
+    '^\.venv/',
+    '^venv/',
+    '^build/',
+    '^dist/',
+    '^reports/',
+    '^logs/',
+    '^data/',
+    '^screenshots/',
+    '^videos/'
+]
+
+# Ignore missing imports cho các thư viện external
+[[tool.mypy.overrides]]
+module = [
+    "selenium.*",
+    "webdriver_manager.*",
+    "pygetwindow.*",
+    "pyautogui.*",
+    "pyperclip.*",
+    "pytest.*",
+    "pandas.*",
+    "openpyxl.*",
+    "faker.*",
+    "colorlog.*",
+    "beautifulsoup4.*",
+    "lxml.*",
+    "PIL.*",
+    "pluggy.*"
+]
+ignore_missing_imports = true
+
+# Strict checking cho code của bạn
+[[tool.mypy.overrides]]
+module = ["pages.*", "utils.*", "config.*"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_return_any = true
+
+# Relaxed checking cho automation scripts
+[[tool.mypy.overrides]]
+module = ["automation.*"]
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+# Test files - ít strict hơn
+[[tool.mypy.overrides]]
+module = ["tests.*", "test_*", "conftest"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
